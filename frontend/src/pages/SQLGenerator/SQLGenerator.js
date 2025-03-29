@@ -4,7 +4,7 @@ import { Copy, Database, Magic, Eye, EyeSlash } from 'react-bootstrap-icons';
 import Editor from '@monaco-editor/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import SchemaGenerator from '../SchemaGenerator/SchemaGenerator';
 const SQLAssistant = () => {
   const navigate = useNavigate();
   const [leftPanelWidth, setLeftPanelWidth] = useState('30%');
