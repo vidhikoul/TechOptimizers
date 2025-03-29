@@ -6,8 +6,19 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import mysql.connector
 import json
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+
+# Allow all origins, methods, and headers (Adjust for security in production)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Update with specific origins for security
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all HTTP methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
