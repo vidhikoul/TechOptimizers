@@ -1,0 +1,4 @@
+fastapi
+langchain
+qroq
+sentance-transformer
