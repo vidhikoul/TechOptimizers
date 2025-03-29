@@ -7,6 +7,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import mysql.connector
 import json
 from fastapi.middleware.cors import CORSMiddleware
+from collections import deque  # Import deque for query queues
 
 app = FastAPI()
 
@@ -25,6 +26,26 @@ embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-
 mysql_connections = {}
 trino_connections = {}
 spark_connections = {}
+
+chat_history = {}
+CHAT_HISTORY_LIMIT = 7  # Store last 7 messages
+
+def update_chat_history(human: str, response: str, uid : str):
+    """Add a new message pair to chat history and maintain limit."""
+    if uid not in chat_history:
+        chat_history[uid] = [{"human": human, "response": response}]
+    else:
+        chat_history[uid].append({"human": human, "response": response})
+    
+    # Keep only last CHAT_HISTORY_LIMIT messages
+    if len(chat_history) > CHAT_HISTORY_LIMIT:
+        chat_history[uid][:] = chat_history[uid][-CHAT_HISTORY_LIMIT:]
+
+def get_relevant_history(uid : str):
+    """Retrieve relevant chat history as a formatted string."""
+    if uid not in chat_history:
+        chat_history[uid] = []
+    return "\n".join([f"Human: {entry['human']}\nResponse: {entry['response']}" for entry in chat_history[uid]])
 
 async def generateQuery():
     pass
@@ -68,31 +89,38 @@ async def generate_query(uid, prompt, dialect):
     except FileNotFoundError:
         shcema = None
     relivent_schema = []
+    relevant_history = get_relevant_history(uid)
+
     if(schema != None):
         relivent_schema = schema.similarity_search(prompt, k = 3)
+
     if(dialect == "mysql"):
         query = f"""Use the following schema to generate MySql Query based on following schema give my only sql query with no explaination:
 
         {relivent_schema}
-
+        consider following history :
+        {relevant_history}
         Question: {prompt}
         Answer:
         """
-        return send_to_groq(query)
-    if dialect == "trino":
-        vector_db = FAISS.load_local("vector_db_trino", embeddings, allow_dangerous_deserialization=True)
-    elif dialect == "spark":
-        vector_db = FAISS.load_local("vector_db_spark", embeddings, allow_dangerous_deserialization=True)
-    docs = vector_db.similarity_search(prompt, k=3)  # Retrieve the top 3 relevant chunks
-    query = f"""Use the following documentation to answer the query and give only SQL query without and explainantions:
+        result_text =  send_to_groq(query)
+    else:
+        if dialect == "trino":
+            vector_db = FAISS.load_local("vector_db_trino", embeddings, allow_dangerous_deserialization=True)
+        elif dialect == "spark":
+            vector_db = FAISS.load_local("vector_db_spark", embeddings, allow_dangerous_deserialization=True)
+        docs = vector_db.similarity_search(prompt, k=3)  # Retrieve the top 3 relevant chunks
+        query = f"""Use the following documentation to answer the query and give only SQL query without and explainantions:
 
-{docs}
-
-Question: {prompt}
-Answer:
-"""
-    return send_to_groq(query)
-
+        {docs}
+        consider following history :
+        {relevant_history}
+        Question: {prompt}
+        Answer:
+        """
+        result_text = send_to_groq(query)
+    update_chat_history(prompt, result_text,uid)
+    return result_text
 # Root endpoint
 @app.get("/")
 async def home():
