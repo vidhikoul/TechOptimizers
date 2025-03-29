@@ -17,6 +17,10 @@ let isConnected = false;
 const authrouter = require("./routers/authRouters");
 app.use('/api/auth', authrouter);
 
+//MYSQL Routers
+const mysqlrouter = require("./routers/mysqlRouters");
+app.use("/api/mysql", mysqlrouter);
+
 // Start the server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
