@@ -1,4 +1,2 @@
 fastapi
-langchain
-qroq
-sentance-transformer
+uvicorn
