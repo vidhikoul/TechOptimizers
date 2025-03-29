@@ -61,3 +61,33 @@ app.post("/api/convert-to-prisma", async (req, res) => {
     });
   }
 });
+
+app.get('/api/sql/schema', async (req, res) => {
+  const { userQuery } = req.query; // Change from req.body to req.query
+
+  if (!userQuery) {
+    return res.status(400).json({ error: "No prompt found" });
+  }
+
+  try {
+    const result = await groq.chat.completions.create({
+      messages: [{ "role": "user", "content": `Generate only SQL schema and give me CREATE TABLE SQL statements only for this prompt: ${userQuery}` }],
+      model: "llama-3.3-70b-versatile",
+      temperature: 1,
+      max_completion_tokens: 1024,
+      top_p: 1,
+      stream: false
+    });
+
+    if (!result.choices || result.choices.length === 0) {
+      throw new Error("No schema response from LLM");
+    }
+
+    const generatedQuery = result.choices[0]?.message?.content?.trim() || '';
+    console.log("Generated Query:", generatedQuery);
+    return res.status(200).json({ schema: generatedQuery });
+  } catch (error) {
+    console.error("Schema recommendation error:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
