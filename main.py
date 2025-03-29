@@ -29,12 +29,6 @@ spark_connections = {}
 async def generateQuery():
     pass
 
-async def executeQuery(uid, query, dialect):
-    if(dialect == 'mysql'):
-        pass
-    else:
-        return "NA"
-
 def extract_text_from_txt(txt_path):
     with open(txt_path, "r", encoding="utf-8") as file:
         text = file.read()
@@ -164,6 +158,8 @@ async def connect(mysqlconnection : MySqlConnection):
     conn = mysql.connector.connect(host=mysqlconnection.host, port=mysqlconnection.port, user=mysqlconnection.user, password=mysqlconnection.password)
     mysql_connections[mysqlconnection.uid] = conn
     user_databases = get_user_databases(conn)
+    conn.cursor().execute("USE " + mysqlconnection.db_name)
+    print("connection successful")
     if not user_databases:
         print("No user-created databases found.")
         return {"message" : "No database found"}
@@ -187,6 +183,33 @@ async def query(query: QueryInput):
     generated = await generate_query(query.uid, query.query, query.dialect)
     return {"sql_query": generated}
 
-class GetSchema(BaseModel):
-    schema: str
-    uid: str
+class ExecuteQuery(BaseModel):
+    query: str
+    uid : str
+    
+@app.post("/mysql/execute-query")
+async def execute_query(executequery: ExecuteQuery):
+    """Execute a SQL query on the user's MySQL database."""
+    uid = executequery.uid
+    query = executequery.query
+    if uid not in mysql_connections:
+        raise HTTPException(status_code=400, detail="User is not connected to a MySQL database.")
+
+    conn = mysql_connections[uid]
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute(query)
+        if query.strip().lower().startswith("select"):
+            flag = True
+            results = cursor.fetchall()
+        else:
+            conn.commit()
+            flag = False
+            results = {"message": "Query executed successfully."}
+    except mysql.connector.Error as err:
+        raise HTTPException(status_code=400, detail=f"Query execution failed: {err}")
+    finally:
+        cursor.close()
+    return {"flag" : flag, "results": results}
+
