@@ -41,7 +41,7 @@ app.post("/api/convert-to-prisma", async (req, res) => {
 
   try {
     // Generate Prisma schema using Groq instead of external API
-    const response = await groq.chat.completions.create({
+    const response = await groqClient.chat.completions.create({
       messages: [{
         role: "user",
         content: `Convert this SQL schema to Prisma schema format:\n\n${sqlSchema}\n\nOnly provide the Prisma schema code, no explanations.`
