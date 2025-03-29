@@ -24,7 +24,7 @@ const SQLAssistant = () => {
   const [showModal, setShowModal] = useState(false);
   const [dbType, setDbType] = useState('mysql');
   const [dbConfig, setDbConfig] = useState({
-    mysql: { host: '', port: '3306', user: '', password: '', database: '' },
+    mysql: { uid : 'tempuser', host: '', port: '3306', user: '', password: '', db_name: '' },
     postgres: { host: '', port: '5432', user: '', password: '', database: '' },
     spark: { host: '', port: '10000', username: '', password: '' },
     trio: { host: '', port: '8080', username: '', password: '' }
@@ -93,9 +93,9 @@ const SQLAssistant = () => {
   // Handle database connection
   const handleConnectDatabase = async () => {
     const currentConfig = dbConfig[dbType];
-    const requiredFields = dbType === 'spark' || dbType === 'trio'
+    const requiredFields = dbType === 'spark' || dbType === 'trino'
       ? ['host', 'port', 'username'] 
-      : ['host', 'port', 'user', 'password', 'database'];
+      : ['host', 'port', 'user', 'password', 'db_name'];
     
     const missingFields = requiredFields.filter(field => !currentConfig[field]);
     if (missingFields.length > 0) {
@@ -103,9 +103,8 @@ const SQLAssistant = () => {
       setShowToast(true);
       return;
     }
-
     try {
-      const response = await fetch('http://localhost:5001/api/sql/connect', {
+      const response = await fetch('http://localhost:5001/api/mysql/connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -119,7 +118,7 @@ const SQLAssistant = () => {
         setShowModal(false);
         setConnectionStatus(`${dbType.toUpperCase()}: ${currentConfig.database || currentConfig.host}`);
         setToastMessage('Connected to database successfully!');
-        setShowToast(true);
+        setShowToast(false);
       } else {
         throw new Error(result.message || 'Failed to connect');
       }
@@ -156,7 +155,7 @@ const SQLAssistant = () => {
   const handleGhostSuggestion = async (comment, position) => {
     setIsGeneratingGhostSuggestion(true);
     try {
-      const res = await axios.get('http://localhost:5001/api/sql/generate', { 
+      const res = await axios.get('http://localhost:5001/api/mysql/generate', { 
         params: { userQuery: comment }  
       });
       if (res.data.sql_query) {
@@ -212,11 +211,11 @@ const SQLAssistant = () => {
     setChatHistory(prev => [...prev, newChatEntry]);
     
     try {
-      const res = await axios.get('http://localhost:5001/api/sql/generate', {
-        params: { userQuery: userQuery }
+      const res = await axios.post('http://localhost:5001/api/mysql/generateSql', {
+        "uid" : "tempuser", "query" : userQuery, "dialect" : "mysql"
       });
       
-      const sqlResponse = res.data.sql_query.replace(/```sql|```/g, '').trim();
+      const sqlResponse = res.data.query.replace(/```sql|```/g, '').trim();
       
       const botChatEntry = { type: 'bot', content: sqlResponse };
       setChatHistory(prev => [...prev, botChatEntry]);
@@ -241,7 +240,7 @@ const SQLAssistant = () => {
     
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5001/api/sql/query', {
+      const response = await fetch('http://localhost:5001/api/mysql/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -298,7 +297,7 @@ const SQLAssistant = () => {
               <Form.Control
                 type="text"
                 value={config.port}
-                onChange={(e) => handleDbConfigChange('port', e.target.value)}
+                onChange={(e) => handleDbConfigChange('port', parseInt(e.target.value))}
                 placeholder="3306"
               />
             </Form.Group>
@@ -325,7 +324,7 @@ const SQLAssistant = () => {
               <Form.Control
                 type="text"
                 value={config.database}
-                onChange={(e) => handleDbConfigChange('database', e.target.value)}
+                onChange={(e) => handleDbConfigChange('db_name', e.target.value)}
                 placeholder="database_name"
               />
             </Form.Group>
