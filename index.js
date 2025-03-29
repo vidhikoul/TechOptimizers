@@ -7,6 +7,10 @@ const { Groq } = require('groq-sdk');
 
 dotenv.config();
 
+const groqClient = new Groq({
+  apiKey: process.env.GROQ_API_KEY, // Store your API key in a .env file
+});
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -71,7 +75,7 @@ app.get('/api/sql/schema', async (req, res) => {
   }
 
   try {
-    const result = await groq.chat.completions.create({
+    const result = await groqClient.chat.completions.create({
       messages: [{ "role": "user", "content": `Generate only SQL schema and give me CREATE TABLE SQL statements only for this prompt: ${userQuery}` }],
       model: "llama-3.3-70b-versatile",
       temperature: 1,
