@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 // Import the database connection functions from db.js
 const {db} = require('./config/db_config');
+const { Groq } = require('groq-sdk');
 
 dotenv.config();
 
