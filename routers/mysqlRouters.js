@@ -6,6 +6,6 @@ router.post("/connect", connectToDB);
 
 router.post("/execute", ExecuteQuery);
 
-router.get("/generateSql", GenerateSQL);
+router.post("/generateSql", GenerateSQL);
 
 module.exports = router;

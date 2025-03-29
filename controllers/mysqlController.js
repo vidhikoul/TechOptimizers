@@ -44,21 +44,17 @@ async function ExecuteQuery(req, res) {
 }
 
 async function GenerateSQL(req, res){
-    const {uid, user, password, host, port, db_name} = req.body;
-    if (!host || !user || !password || !db_name || !uid || !port) {
+    const {uid, query, dialect} = req.body;
+    if (!uid || !query || !dialect) {
         return res.status(400).json({ error: "Missing required database credentials" });
     }
-
     try {
-        const response = await axios.post(process.env.SERVER_URL + "mysql/connect", {
-            "uid":uid,
-            "user":user,
-            "password":password,
-            "host":host,
-           "port":port,
-            "db_name":db_name,
+        const response = await axios.post(process.env.SERVER_URL + "query", {
+            "uid": uid,
+            "query" : query,
+            "dialect" : "mysql"
         });
-        return res.json({success : true, message: "Credentials sent successfully" });
+        return res.json({success : true, query: response.data.sql_query });
     } catch (error) {
         return res.status(500).json({success : false , message: error.message });
     }
