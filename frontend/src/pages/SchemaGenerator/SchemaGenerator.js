@@ -138,14 +138,14 @@ const SchemaGenerator = () => {
 
   return (
     <Container fluid className="p-4 bg-light" style={{ minHeight: "100vh" }}>
-      <Row className="mb-4">
-        <Col>
+      {/* <Row className="mb-4">
+        {/* <Col>
           <h3>SCHEMA GENERATOR</h3>
-        </Col>
-      </Row>
+        </Col> */}
+      {/* </Row> */} 
       <Navbar bg="dark" variant="dark" className="mb-4 p-3">
         <Container className="d-flex justify-content-between align-items-center">
-          <Navbar.Brand className="fs-3 fw-bold">SQL Assistant</Navbar.Brand>
+          <Navbar.Brand className="fs-3 fw-bold">Schema Generator</Navbar.Brand>
           <div className="d-flex ms-auto gap-2">
             <Button
               variant="light"
@@ -157,11 +157,13 @@ const SchemaGenerator = () => {
             </Button>
             <Button
               variant="primary"
-              onClick={() => setShowModal(true)}
+              onClick={() => navigate('/SQLGenerator')}
               disabled={loading}
             >
               <FaDatabase className="me-2" />
+
               Connect Database
+             
             </Button>
           </div>
         </Container>
@@ -282,6 +284,23 @@ const SchemaGenerator = () => {
                   'Generate Schema'
                 )}
               </Button>
+
+              {/* Display Prisma Schema */}
+              {prismaSchema && (
+                <Card className="mt-3">
+                  <Card.Header>Prisma Schema</Card.Header>
+                  <Card.Body>
+                    <pre style={{ fontSize: '0.8rem' }}>{prismaSchema}</pre>
+                    <Button 
+                      variant="outline-secondary" 
+                      size="sm" 
+                      onClick={() => copyToClipboard(prismaSchema)}
+                    >
+                      <FaCopy className="me-1" /> Copy Prisma Schema
+                    </Button>
+                  </Card.Body>
+                </Card>
+              )}
             </Card.Body>
           </Card>
         </Col>
@@ -308,22 +327,7 @@ const SchemaGenerator = () => {
                 </Card.Body>
               </Card>
 
-              {/* Display Prisma Schema */}
-              {prismaSchema && (
-                <Card className="mt-3">
-                  <Card.Header>Prisma Schema</Card.Header>
-                  <Card.Body>
-                    <pre style={{ fontSize: '0.8rem' }}>{prismaSchema}</pre>
-                    <Button 
-                      variant="outline-secondary" 
-                      size="sm" 
-                      onClick={() => copyToClipboard(prismaSchema)}
-                    >
-                      <FaCopy className="me-1" /> Copy Prisma Schema
-                    </Button>
-                  </Card.Body>
-                </Card>
-              )}
+              
             </Card.Body>
           </Card>
         </Col>
