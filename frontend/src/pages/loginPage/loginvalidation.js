@@ -12,10 +12,10 @@ function LoginValidation(values) {
     const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 
     // Validate email
-    if (!values.user_name.trim()) {
-        error.user_name = "Email should not be empty";
-    } else if (!emailPattern.test(values.user_name)) {
-        error.user_name = "Invalid email format";
+    if (!values.uid.trim()) {
+        error.uid = "Email should not be empty";
+    } else if (!emailPattern.test(values.uid)) {
+        error.uid = "Invalid email format";
     }
 
     // Validate password

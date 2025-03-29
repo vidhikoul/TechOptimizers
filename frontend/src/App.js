@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
+
 import Login from './pages/loginPage/Login';
 import Registration from './pages/Registration/Register';
-// import Dashboard from './pages/Dashboard/Dashboard'; // Make sure to import Dashboard
-import SQLGenerator from './pages/SQLGenerator/SQLGenerator.js'
+import SQLAssistant from './pages/SQLGenerator/SQLGenerator'; // Correct the path for SQLAssistant
+import SchemaGenerator from './pages/SchemaGenerator/SchemaGenerator'; // Correct the path for SchemaGenerator
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
     localStorage.getItem("isLoggedIn") === "true"
@@ -24,14 +26,18 @@ function App() {
             element={!isLoggedIn ? <Login setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/SQLGenerator" />} 
           />
 
-          {/* Dashboard Route */}
+          {/* SQLAssistant Route */}
           <Route 
             path="/SQLGenerator" 
-            element={isLoggedIn ? <SQLGenerator setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/" />} 
+            element={isLoggedIn ? <SQLAssistant setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/" />} 
           />
-           <Route path="/Registration" element={<Registration />} />
+          
+          {/* Registration Route */}
+          <Route path="/Registration" element={<Registration />} />
 
-          {/* You can add more routes if needed */}
+          {/* Schema Generator Route */}
+          <Route path="/SchemaGenerator" element={<SchemaGenerator />} />
+
         </Routes>
       </main>
     </Router>

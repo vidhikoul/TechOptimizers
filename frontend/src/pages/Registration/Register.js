@@ -1,22 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"; 
+import axios from "axios";
 import { Registrationvalidation } from "./Registrationvalidation";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    first_name: "",
-    last_name: "",
-    user_name: "",
+    uid: "",         // Email
     password: "",
     confirm_password: "",
-    role: "admin",  // Default role
     termsAccepted: false,
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);  // For showing loading spinner on form submission
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,8 +25,11 @@ const RegisterPage = () => {
     setFormData({ ...formData, termsAccepted: e.target.checked });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Log form data to check its values before sending it
+    console.log("Form Data before submission:", formData);
 
     // Run validation
     const validationErrors = Registrationvalidation(formData);
@@ -36,26 +37,39 @@ const RegisterPage = () => {
 
     // If there are validation errors, stop submission
     if (Object.keys(validationErrors).length > 0) {
+      console.log("Validation errors:", validationErrors);
       return;
     }
 
+    // Check if terms are accepted
     if (!formData.termsAccepted) {
       alert("You must accept the Terms of Use and Privacy Policy.");
       return;
     }
 
-    axios
-      .post("http://localhost:8800/Registration", formData)
-      .then((res) => {
-        console.log("Registration successful:", res.data);
-        navigate("/");
-      })
-      .catch((err) => console.log("Registration error:", err));
+    // Show loading spinner while waiting for the response
+    setLoading(true);
+
+    try {
+      console.log("Sending POST request to backend...");
+      // Send the form data to the backend
+      const res = await axios.post("https://techoptimizers.onrender.com/api/auth/register", formData);
+      console.log("Response from backend:", res);
+
+      // If registration is successful, navigate to the login page or desired page
+      navigate("/");  // Redirect to the login page after successful registration
+    } catch (err) {
+      console.error("Registration error:", err);
+      alert("Registration failed. Please try again later.");
+    } finally {
+      // Hide loading spinner once the request is complete
+      setLoading(false);
+    }
   };
 
   const handleLogin = (e) => {
     e.preventDefault();
-    navigate("/"); 
+    navigate("/");  // Ensure this route is correct
   };
 
   return (
@@ -74,48 +88,22 @@ const RegisterPage = () => {
         {/* Form Section */}
         <div className="col-md-6 p-5">
           <h2 className="mb-4">REGISTER</h2>
-          {/* <p className="text-muted mb-4 font-weight-bold">
-            Manage inventory<br />Track & organize your inventory with ease
-          </p> */}
           <form onSubmit={handleSubmit}>
-            <div className="row g-3 mb-3">
-              <div className="col-6">
-                <input
-                  type="text"
-                  name="first_name"
-                  placeholder="First name"
-                  value={formData.first_name}
-                  onChange={handleInputChange}
-                  className="form-control"
-                  required
-                />
-                {errors.first_name && <span className="text-danger">{errors.first_name}</span>}
-              </div>
-              <div className="col-6">
-                <input
-                  type="text"
-                  name="last_name"
-                  placeholder="Last name"
-                  value={formData.last_name}
-                  onChange={handleInputChange}
-                  className="form-control"
-                  required
-                />
-                {errors.last_name && <span className="text-danger">{errors.last_name}</span>}
-              </div>
-            </div>
+            {/* Email Field */}
             <div className="mb-3">
               <input
                 type="email"
-                name="user_name"
+                name="uid"
                 placeholder="Email"
-                value={formData.user_name}
+                value={formData.uid}
                 onChange={handleInputChange}
                 className="form-control"
                 required
               />
-              {errors.user_name && <span className="text-danger">{errors.user_name}</span>}
+              {errors.uid && <span className="text-danger">{errors.uid}</span>}
             </div>
+
+            {/* Password Field */}
             <div className="mb-3">
               <input
                 type="password"
@@ -128,6 +116,7 @@ const RegisterPage = () => {
               />
               {errors.password && <span className="text-danger">{errors.password}</span>}
             </div>
+
             {/* Confirm Password Field */}
             <div className="mb-3">
               <input
@@ -141,36 +130,25 @@ const RegisterPage = () => {
               />
               {errors.confirm_password && <span className="text-danger">{errors.confirm_password}</span>}
             </div>
-            {/* Role Dropdown */}
-            <div className="mb-3">
-  {/* <select
-    name="role"
-    value={formData.role}
-    onChange={handleInputChange}  // This ensures selection updates correctly
-    className="form-control"
-  >
-    <option value="admin">Admin</option>
-    <option value="operator">Operator</option>
-    <option value="manager">Manager</option>
-    <option value="security_guard">Security Guard</option>
-  </select> */}
-  {errors.role && <span className="text-danger">{errors.role}</span>}
-</div>
 
+            {/* Terms and Conditions Checkbox */}
             <div className="form-check mb-3">
-              {/* <input
+              <input
                 type="checkbox"
                 id="terms"
                 checked={formData.termsAccepted}
                 onChange={handleCheckboxChange}
                 className="form-check-input"
-              /> */}
-              {/* <label htmlFor="terms" className="form-check-label">
-                I agree to all <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a>
-              </label> */}
+              />
+              <label htmlFor="terms" className="form-check-label">
+                I agree to the <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a>
+              </label>
             </div>
-            <button type="submit" className="btn btn-primary w-100">
-              CREATE ACCOUNT
+            {errors.termsAccepted && <span className="text-danger">{errors.termsAccepted}</span>}
+
+            {/* Submit Button */}
+            <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+              {loading ? <span>Loading...</span> : "CREATE ACCOUNT"}
             </button>
           </form>
           <p className="text-center mt-4">

@@ -8,7 +8,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
     const navigate = useNavigate();
 
     const [values, setValues] = useState({
-        user_name: "",
+        uid: "",
         password: ""
     });
 
@@ -33,14 +33,15 @@ const LoginPage = ({ setIsLoggedIn }) => {
         }
 
         try {
-            const res = await axios.post("http://localhost:8800/Login", values);
+            const res = await axios.post("https://techoptimizers.onrender.com/api/auth/login", values);
             console.log("Login successful:", res.data);
 
             if (setIsLoggedIn) {
                 setIsLoggedIn(true);
             }
 
-            navigate("/Dashboard",{ replace: true }); 
+            // Redirect to SQL Generator page after successful login
+            navigate("/SQLGenerator", { replace: true }); 
         } catch (err) {
             console.error("Login error:", err);
 
@@ -54,10 +55,6 @@ const LoginPage = ({ setIsLoggedIn }) => {
 
     const handleSignUp = () => {
         navigate("/Registration");
-    };
-
-    const handleForgotPassword = () => {
-        navigate("/ForgotPassword");
     };
 
     return (
@@ -76,12 +73,12 @@ const LoginPage = ({ setIsLoggedIn }) => {
                                 type="email"
                                 className="form-control"
                                 placeholder="Enter email as username"
-                                name="user_name"
-                                value={values.user_name}
+                                name="uid"
+                                value={values.uid}
                                 onChange={handleInput}
                                 required
                             />
-                            {errors.user_name && <span className="text-danger">{errors.user_name}</span>}
+                            {errors.uid && <span className="text-danger">{errors.uid}</span>}
                         </div>
                         <div className="mb-3">
                             <label className="form-label">Password*</label>
@@ -96,9 +93,6 @@ const LoginPage = ({ setIsLoggedIn }) => {
                             />
                             {errors.password && <span className="text-danger">{errors.password}</span>}
                         </div>
-                        {/* <div className="mb-3 d-flex justify-content-between">
-                            <a href="#" className="text-decoration-none" onClick={handleForgotPassword}>Forgot password?</a>
-                        </div> */}
                         <button type="submit" className="btn btn-dark w-100" onClick={handleLogin}>LOGIN</button>
                     </form>
 
