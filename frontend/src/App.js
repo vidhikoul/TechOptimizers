@@ -6,11 +6,33 @@ import Login from './pages/loginPage/Login';
 import Registration from './pages/Registration/Register';
 import SQLAssistant from './pages/SQLGenerator/SQLGenerator'; // Correct the path for SQLAssistant
 import SchemaGenerator from './pages/SchemaGenerator/SchemaGenerator'; // Correct the path for SchemaGenerator
+import SQLGenerator from "./pages/SQLGenerator/SQLGenerator.js"; // SQLGenerator route
+import Dashboard from "./components/dashboard.js"; // Dashboard route
+import Documentation from "./docs/page.js"; // Documentation route
+import DarkModeToggle from "./components/DarkModeToggle"; // Assuming you created this component
+
+import HomePage from "./pages/HomePage"; // HomePage with a SignIn link
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
     localStorage.getItem("isLoggedIn") === "true"
   );
+  const [isDarkMode, setIsDarkMode] = useState(
+    localStorage.getItem("darkMode") === "true" // Check if dark mode is set in localStorage
+  );
+
+  // Set dark mode in body element
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+
+    // Save dark mode state to localStorage
+    localStorage.setItem("darkMode", isDarkMode);
+  }, [isDarkMode]);
+
 
   useEffect(() => {
     localStorage.setItem("isLoggedIn", isLoggedIn);
@@ -19,17 +41,20 @@ function App() {
   return (
     <Router>
       <main className="main-content">
+      <DarkModeToggle isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />{" "}
+
         <Routes>
           {/* Login Route */}
           <Route 
-            path="/" 
+            path="/Login" 
             element={!isLoggedIn ? <Login setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/SQLGenerator" />} 
           />
+          <Route path="/" element={<HomePage />} />
 
           {/* SQLAssistant Route */}
           <Route 
             path="/SQLGenerator" 
-            element={isLoggedIn ? <SQLAssistant setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/" />} 
+            element={isLoggedIn ? <SQLAssistant setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/Login" />} 
           />
           
           {/* Registration Route */}
@@ -37,6 +62,27 @@ function App() {
 
           {/* Schema Generator Route */}
           <Route path="/SchemaGenerator" element={<SchemaGenerator />} />
+
+            {/* Dashboard Route */}
+            <Route
+            path="/dashboard"
+            element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />}
+          />
+
+          {/* Documentation Route */}
+          <Route path="/docs" element={<Documentation />} />
+
+          {/* Assistant Route */}
+          <Route
+            path="/assistant"
+            element={
+              isLoggedIn ? (
+                <SQLGenerator setIsLoggedIn={setIsLoggedIn} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+            />
 
         </Routes>
       </main>

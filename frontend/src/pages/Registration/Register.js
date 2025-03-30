@@ -57,7 +57,7 @@ const RegisterPage = () => {
       console.log("Response from backend:", res);
 
       // If registration is successful, navigate to the login page or desired page
-      navigate("/");  // Redirect to the login page after successful registration
+      navigate("/Login");  // Redirect to the login page after successful registration
     } catch (err) {
       console.error("Registration error:", err);
       alert("Registration failed. Please try again later.");
@@ -69,7 +69,7 @@ const RegisterPage = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    navigate("/");  // Ensure this route is correct
+    navigate("/Login");  // Ensure this route is correct
   };
 
   return (
