@@ -174,12 +174,14 @@ const SQLAssistant = () => {
   const handleGhostSuggestion = async (comment) => {
     setIsGeneratingGhostSuggestion(true);
     try {
-      const res = await axios.get(`http://localhost:5001/api/${dbType}/generate`, { 
-        params: { userQuery: comment }  
+      const res = await axios.post(`http://localhost:5001/api/${dbType}/generateSql`, {
+        "uid" : "tempuser", "query" : comment, "dialect" : dbType
       });
-      if (res.data.sql_query) {
-        setGhostSuggestion(res.data.sql_query.replace(/```sql|```/g, '').trim());
+      console.log(res.data);
+      if (res.data.success) {
+        setGhostSuggestion(res.data.query.replace(/```sql|```/g, '').trim());
         setShowGhostSuggestion(true);
+        
       }
     } catch (error) {
       setToastMessage('Error generating SQL from comment!');
@@ -221,7 +223,7 @@ const SQLAssistant = () => {
     
     try {
       const res = await axios.post(`http://localhost:5001/api/${dbType}/generateSql`, {
-        "uid" : "tempuser", "query" : userQuery, "dialect" : "mysql"
+        "uid" : "tempuser", "query" : userQuery, "dialect" : dbType
       });
       
       const sqlResponse = res.data.query.replace(/```sql|```/g, '').trim();

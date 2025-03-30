@@ -53,7 +53,7 @@ const RegisterPage = () => {
     try {
       console.log("Sending POST request to backend...");
       // Send the form data to the backend
-      const res = await axios.post("https://techoptimizers.onrender.com/api/auth/register", formData);
+      const res = await axios.post("http://localhost:5001/api/auth/register", formData);
       console.log("Response from backend:", res);
 
       // If registration is successful, navigate to the login page or desired page

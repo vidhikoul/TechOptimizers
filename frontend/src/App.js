@@ -9,7 +9,7 @@ import SchemaGenerator from './pages/SchemaGenerator/SchemaGenerator'; // Correc
 import SQLGenerator from "./pages/SQLGenerator/SQLGenerator.js"; // SQLGenerator route
 import Dashboard from "./components/dashboard.js"; // Dashboard route
 import Documentation from "./docs/page.js"; // Documentation route
-import DarkModeToggle from "./components/DarkModeToggle"; // Assuming you created this component
+// import DarkModeToggle from "./components/DarkModeToggle"; // Assuming you created this component
 
 import HomePage from "./pages/HomePage"; // HomePage with a SignIn link
 
@@ -17,21 +17,21 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
     localStorage.getItem("isLoggedIn") === "true"
   );
-  const [isDarkMode, setIsDarkMode] = useState(
-    localStorage.getItem("darkMode") === "true" // Check if dark mode is set in localStorage
-  );
+  // const [isDarkMode, setIsDarkMode] = useState(
+  //   localStorage.getItem("darkMode") === "true" // Check if dark mode is set in localStorage
+  // );
 
   // Set dark mode in body element
-  useEffect(() => {
-    if (isDarkMode) {
-      document.body.classList.add("dark-mode");
-    } else {
-      document.body.classList.remove("dark-mode");
-    }
+  // useEffect(() => {
+  //   if (isDarkMode) {
+  //     document.body.classList.add("dark-mode");
+  //   } else {
+  //     document.body.classList.remove("dark-mode");
+  //   }
 
-    // Save dark mode state to localStorage
-    localStorage.setItem("darkMode", isDarkMode);
-  }, [isDarkMode]);
+  //   // Save dark mode state to localStorage
+  //   localStorage.setItem("darkMode", isDarkMode);
+  // }, [isDarkMode]);
 
 
   useEffect(() => {
@@ -41,7 +41,7 @@ function App() {
   return (
     <Router>
       <main className="main-content">
-      <DarkModeToggle isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />{" "}
+      {/* <DarkModeToggle isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />{" "} */}
 
         <Routes>
           {/* Login Route */}

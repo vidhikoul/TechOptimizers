@@ -33,7 +33,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
         }
 
         try {
-            const res = await axios.post("https://techoptimizers.onrender.com/api/auth/login", values);
+            const res = await axios.post("http://localhost:5001/api/auth/login", values);
             console.log("Login successful:", res.data);
 
             if (setIsLoggedIn) {
