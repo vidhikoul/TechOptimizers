@@ -30,6 +30,7 @@ const SQLAssistant = () => {
   const dividerRef = useRef(null);
   const containerRef = useRef(null);
 
+  
   // State declarations
   const [userQuery, setUserQuery] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
@@ -42,7 +43,7 @@ const SQLAssistant = () => {
     mysql: { uid : 'tempuser', host: '', port: '3306', user: '', password: '', db_name: '' },
     postgres: { host: '', port: '5432', user: '', password: '', database: '' },
     spark: { host: '', port: '10000', username: '', password: '' },
-    trino: { host: '', port: '8080', username: '', password: '' }
+    trino: { host: '', port: '8080', user: '', password: '', uid  :"tempuser" }
   });
   const [connectionStatus, setConnectionStatus] = useState('');
   const [ghostMode, setGhostMode] = useState(false);
@@ -114,7 +115,7 @@ const SQLAssistant = () => {
   const handleConnectDatabase = async () => {
     const currentConfig = dbConfig[dbType];
     const requiredFields = dbType === 'spark' || dbType === 'trino'
-      ? ['host', 'port', 'username'] 
+      ? ['host', 'port', 'user'] 
       : ['host', 'port', 'user', 'password', 'db_name'];
     
     const missingFields = requiredFields.filter(field => !currentConfig[field]);
@@ -124,7 +125,7 @@ const SQLAssistant = () => {
       return;
     }
     try {
-      const response = await fetch('http://localhost:5001/api/mysql/connect', {
+      const response = await fetch(`http://localhost:5001/api/${dbType}/connect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dbType, ...currentConfig }),
@@ -173,7 +174,7 @@ const SQLAssistant = () => {
   const handleGhostSuggestion = async (comment) => {
     setIsGeneratingGhostSuggestion(true);
     try {
-      const res = await axios.get('http://localhost:5001/api/mysql/generate', { 
+      const res = await axios.get(`http://localhost:5001/api/${dbType}/generate`, { 
         params: { userQuery: comment }  
       });
       if (res.data.sql_query) {
@@ -219,7 +220,7 @@ const SQLAssistant = () => {
     setChatHistory(prev => [...prev, { type: 'user', content: userQuery }]);
     
     try {
-      const res = await axios.post('http://localhost:5001/api/mysql/generateSql', {
+      const res = await axios.post(`http://localhost:5001/api/${dbType}/generateSql`, {
         "uid" : "tempuser", "query" : userQuery, "dialect" : "mysql"
       });
       
@@ -243,7 +244,7 @@ const SQLAssistant = () => {
     
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5001/api/mysql/execute', {
+      const response = await fetch(`http://localhost:5001/api/${dbType}/execute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -255,7 +256,10 @@ const SQLAssistant = () => {
 
       const result = await response.json();
       if (result.success) {
-        setQueryResult(result.data);
+
+        if(result.flag){
+          setQueryResult(result.results);
+        }
         setToastMessage('Query executed successfully!');
       } else {
         throw new Error(result.message || 'Failed to execute query');
@@ -281,7 +285,7 @@ const SQLAssistant = () => {
     const commonFields = [
       { field: 'host', placeholder: 'localhost' },
       { field: 'port', placeholder: dbType === 'mysql' ? '3306' : dbType === 'postgres' ? '5432' : dbType === 'spark' ? '10000' : '8080' },
-      { field: dbType === 'spark' || dbType === 'trino' ? 'username' : 'user', placeholder: dbType === 'mysql' ? 'root' : dbType === 'postgres' ? 'postgres' : dbType === 'spark' ? 'spark_user' : 'trino_user' }
+      { field: dbType === 'spark' || dbType === 'trino' ? 'user' : 'user', placeholder: dbType === 'mysql' ? 'root' : dbType === 'postgres' ? 'postgres' : dbType === 'spark' ? 'spark_user' : 'trino_user' }
     ];
 
     return (
@@ -337,37 +341,37 @@ const SQLAssistant = () => {
   };
 
   const renderQueryResults = () => {
-    if (!queryResult) {
-      return <div className="text-muted p-3">Results will appear here after query execution</div>;
-    }
+  if (!queryResult) {
+    return <div className="text-muted p-3">Results will appear here after query execution</div>;
+  }
 
-    if (queryResult.length === 0) {
-      return <div className="text-muted p-3">Query executed successfully but returned no data</div>;
-    }
+  if (queryResult.length === 0) {
+    return <div className="text-muted p-3">Query executed successfully but returned no data</div>;
+  }
 
-    return (
-      <div className="query-results-container">
-        <Table bordered hover size="sm" className="results-table m-0">
-          <thead>
-            <tr>
-              {Object.keys(queryResult[0]).map((key) => (
-                <th key={key}>{key}</th>
+  return (
+    <div className="query-results-container">
+      <Table bordered hover size="sm" className="results-table m-0">
+        <thead>
+          <tr>
+            {Object.keys(queryResult[0]).map((key) => (
+              <th key={key}>{key}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {queryResult.map((row, index) => (
+            <tr key={index}>
+              {Object.values(row).map((value, idx) => (
+                <td key={idx}>{String(value)}</td>
               ))}
             </tr>
-          </thead>
-          <tbody>
-            {queryResult.map((row, index) => (
-              <tr key={index}>
-                {Object.values(row).map((value, idx) => (
-                  <td key={idx}>{String(value)}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </div>
-    );
-  };
+          ))}
+        </tbody>
+      </Table>
+    </div>
+  );
+};
 
   return (
     <ResizeObserverErrorBoundary>
@@ -397,7 +401,7 @@ const SQLAssistant = () => {
             min-width: 40%;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: visible;
             contain: strict;
           }
 
@@ -420,16 +424,16 @@ const SQLAssistant = () => {
 
           .editor-container {
             flex: 1;
-            min-height: 200px;
+            min-height: 50%;
             overflow: hidden;
             contain: strict;
           }
 
           .query-results-container {
             flex: 1;
-            min-height: 200px;
+            min-height: 100%;
             max-height: 300px;
-            overflow: auto;
+            overflow: scroll;
             contain: strict;
           }
 
@@ -439,9 +443,7 @@ const SQLAssistant = () => {
           }
 
           .results-table th {
-            position: sticky;
-            top: 0;
-            background: white;
+            
             z-index: 10;
           }
 
@@ -510,6 +512,7 @@ const SQLAssistant = () => {
             margin-right: auto;
             border-bottom-left-radius: 2px;
           }
+          
         `}</style>
         
         <Navbar bg="dark" variant="dark" className="p-3">
@@ -617,7 +620,7 @@ const SQLAssistant = () => {
             onMouseDown={handleDividerMouseDown}
           />
 
-          <div className="right-panel d-flex flex-column">
+          <div className="right-panel flex flex-column">
             <div className="d-flex flex-column h-100 position-relative">
               <div 
                 className={`ghost-mode-toggle ${ghostMode ? 'active' : ''}`}
