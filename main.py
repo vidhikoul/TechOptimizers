@@ -5,9 +5,8 @@ from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import mysql.connector
-import json
+import trino
 from fastapi.middleware.cors import CORSMiddleware
-from collections import deque  # Import deque for query queues
 
 app = FastAPI()
 
@@ -47,8 +46,53 @@ def get_relevant_history(uid : str):
         chat_history[uid] = []
     return "\n".join([f"Human: {entry['human']}\nResponse: {entry['response']}" for entry in chat_history[uid]])
 
-async def generateQuery():
-    pass
+def query_trino(uid, sql_query):
+    """Connects to Trino and executes a SQL query."""
+    try:
+        cur = trino_connections[uid].cursor()
+        cur.execute(sql_query)
+        rows = cur.fetchall()
+        return rows
+    except Exception as e:
+        print("Error:", e)
+        return None
+
+def fetch_info_schema(uid,schema="default"):
+    sql_query = f"""
+    SELECT table_name, column_name, data_type
+    FROM mysql.information_schema.columns
+    WHERE table_schema = '{schema}'
+    """
+    rows = query_trino(uid,sql_query)
+    
+    schema_info = {}
+    if rows:
+        for table_name, column_name, data_type in rows:
+            if table_name not in schema_info:
+                schema_info[table_name] = []
+            schema_info[table_name].append({"column": column_name, "type": data_type})
+    
+    # If schema_info is empty, try alternative methods
+    if not schema_info:
+        schema_info = fetch_schema_alternative(uid,schema)
+    
+    return schema_info
+
+def fetch_schema_alternative(uid,schema):
+    schema_info = {}
+    tables_query = f"SHOW TABLES FROM {schema}"
+    tables = query_trino(uid,tables_query)
+    
+    if tables:
+        for table in tables:
+            table_name = table[0]
+            describe_query = f"DESCRIBE {schema}.{table_name}"
+            columns = query_trino(uid,describe_query)
+            schema_info[table_name] = [
+                {"column": row[0], "type": row[1]} for row in columns
+            ]
+    
+    return schema_info
 
 def extract_text_from_txt(txt_path):
     with open(txt_path, "r", encoding="utf-8") as file:
@@ -240,4 +284,51 @@ async def execute_query(executequery: ExecuteQuery):
     finally:
         cursor.close()
     return {"flag" : flag, "results": results}
+
+class TrinoConnect(BaseModel):
+    host: str
+    port : int
+    user : str
+    uid : str
+@app.post("/trino/connect")
+async def trinoconnect(trinoconnect : TrinoConnect):
+    conn = trino.dbapi.connect(
+            host=trinoconnect.host,
+            port=trinoconnect.port,
+            user=trinoconnect.user
+        )
+    trino_connections[trinoconnect.uid] = conn
+    schema_data = fetch_info_schema(trinoconnect.uid,"mysql.mydb")
+    print(schema_data)
+    descriptions = []
+    for table, columns in schema_data.items():
+        column_descriptions = ", ".join(
+            [f"{col['column']} ({col['type']})" for col in columns]
+        )
+        table_description = f"Table: {table}, Columns: {column_descriptions}"
+        descriptions.append(table_description)
+    # Create FAISS vector store
+    vector_db = FAISS.from_texts(descriptions, embeddings)
+    # Save FAISS index
+    vector_db.save_local(f"{trinoconnect.uid}_schema_db")
+    return {"message" : "success"}
+
+class TrinoExecute(BaseModel):
+    query : str
+    uid : str
+@app.post("/trino/execute")
+async def trinoExecute(trinoexecute : TrinoExecute):
+    if trinoexecute.uid not in trino_connections:
+        raise HTTPException(status_code=400, detail="User is not connected to a Trino database.")
+    conn = trino_connections[trinoexecute.uid]
+    cursor = conn.cursor()
+    try:
+        cursor.execute(trinoexecute.query)
+        results = cursor.fetchall()
+        print(results)
+        return {"results": results}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Query execution failed: {e}")
+    finally:
+        cursor.close()
 
