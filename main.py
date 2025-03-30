@@ -128,9 +128,10 @@ def send_to_groq(query):
     return response_text
 
 async def generate_query(uid, prompt, dialect):
+    schema=None
     try:
         schema = FAISS.load_local(f"{uid}_schema_db", embeddings, allow_dangerous_deserialization=True)
-    except FileNotFoundError:
+    except Exception:
         shcema = None
     relivent_schema = []
     relevant_history = get_relevant_history(uid)
@@ -153,15 +154,20 @@ async def generate_query(uid, prompt, dialect):
             vector_db = FAISS.load_local("vector_db_trino", embeddings, allow_dangerous_deserialization=True)
         elif dialect == "spark":
             vector_db = FAISS.load_local("vector_db_spark", embeddings, allow_dangerous_deserialization=True)
-        docs = vector_db.similarity_search(prompt, k=3)  # Retrieve the top 3 relevant chunks
-        query = f"""Use the following documentation to answer the query and give only SQL query without and explainantions:
+        
+        docs = vector_db.similarity_search_with_score(prompt)  # Retrieve the top 4 relevant chunks
 
+        # docs = []
+        query = f"""Use the following documentation to answer the query in {dialect} dialect and give only {dialect} SQL query without and explainantions:
         {docs}
+        consider following schema :
+        {relevant_history}
         consider following history :
         {relevant_history}
         Question: {prompt}
         Answer:
         """
+        print(query)
         result_text = send_to_groq(query)
     update_chat_history(prompt, result_text,uid)
     return result_text
