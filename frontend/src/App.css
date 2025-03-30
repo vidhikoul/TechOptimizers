@@ -53,7 +53,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #a2b0ca;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -78,4 +78,126 @@
 
 
 
+.hover-glow:hover {
+  text-shadow: 0 0 10px rgba(255,255,255,0.8);
+  background: rgba(166, 140, 140, 0.05) !important;
+}
 
+.glow-icon {
+  transition: all 0.3s ease;
+}
+.glow-icon:hover {
+  filter: drop-shadow(0 0 8px rgba(228, 148, 243, 0.9));
+}
+
+.neon-text {
+  text-shadow: 0 0 8px rgba(176, 143, 181, 0.8);
+}
+ 
+
+
+
+
+   {/* Add this to your global CSS */}
+   
+    body {
+      background-color: #d6d3f1;
+      background-image: linear-gradient(145deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      color: #fff;
+      min-height: 100vh;
+    }
+    
+    .hover-glow:hover {
+      background: rgba(184, 155, 242, 0.1) !important;
+      text-shadow: 0 0 8px rgba(173, 136, 246, 0.5);
+    }
+    
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .step-number {
+      background: linear-gradient(145deg, #997cb8, #91aee0);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+      box-shadow: 0 4px 8px rgba(95, 40, 40, 0.2);
+    }
+    
+    .step-content {
+      color: #e0e0e0;
+      padding-top: 4px;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .feature-card {
+      background: rgba(193, 193, 255, 0.5);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid rgba(169, 153, 201, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(255, 189, 189, 0.2);
+      border-color: rgba(191, 170, 234, 0.5);
+    }
+    
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      background: linear-gradient(145deg, #b08fd3, #6b7ea0);
+    }
+    
+    .feature-card h4 {
+      color: #fff;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    
+    .feature-card p {
+      color: #b8b8b8;
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+    
+    .text-monospace {
+      font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    
+    .text-primary {
+      color: #d0c3f9 !important;
+     }
+    /* const lightPurpleBackground = {
+      background: 'rgba(220, 210, 255, 0.15)', // Light purple with transparency
+      backdropFilter: 'blur(10px)',
+      borderRadius: '16px',
+      padding: '2rem',
+      boxShadow: '0 8px 32px rgba(101, 43, 215, 0.2)'
+    }; */ 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
-
+// import { useState } from "react";
+import { ThemeProvider } from "react-bootstrap";
 import Login from './pages/loginPage/Login';
 import Registration from './pages/Registration/Register';
 import SQLAssistant from './pages/SQLGenerator/SQLGenerator'; // Correct the path for SQLAssistant
@@ -17,6 +18,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
     localStorage.getItem("isLoggedIn") === "true"
   );
+  const [darkMode, setDarkMode] = useState(false);
   // const [isDarkMode, setIsDarkMode] = useState(
   //   localStorage.getItem("darkMode") === "true" // Check if dark mode is set in localStorage
   // );
@@ -39,6 +41,19 @@ function App() {
   }, [isLoggedIn]);
 
   return (
+    // <ThemeProvider data-bs-theme={darkMode ? "dark" : "light"}>
+    //   <Container fluid className="p-3 min-vh-100 bg-body">
+    //     {/* Navbar with toggle */}
+    //     <Navbar bg={darkMode ? "dark" : "light"} variant={darkMode ? "dark" : "light"}>
+    //       <Nav className="ms-auto">
+    //         <button 
+    //           onClick={() => setDarkMode(!darkMode)}
+    //           className="btn btn-sm btn-outline-secondary"
+    //         >
+    //           {darkMode ? "☀️ Light" : "🌙 Dark"}
+    //         </button>
+    //       </Nav>
+    //     </Navbar>
     <Router>
       <main className="main-content">
       {/* <DarkModeToggle isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />{" "} */}
@@ -87,6 +102,8 @@ function App() {
         </Routes>
       </main>
     </Router>
+    // </Container>
+    // </ThemeProvider>
   );
 }
 
