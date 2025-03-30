@@ -26,6 +26,11 @@ app.use('/api/auth', authrouter);
 const mysqlrouter = require("./routers/mysqlRouters");
 app.use("/api/mysql", mysqlrouter);
 
+//Trino Routers
+const trinoRouters = require("./routers/trinoRouters");
+app.use("/api/trino", trinoRouters);
+
+
 // Start the server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
