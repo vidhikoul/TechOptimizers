@@ -316,7 +316,7 @@ async def trinoconnect(trinoconnect : TrinoConnect):
 class TrinoExecute(BaseModel):
     query : str
     uid : str
-@app.post("/trino/execute")
+@app.post("/trino/execute-query")
 async def trinoExecute(trinoexecute : TrinoExecute):
     if trinoexecute.uid not in trino_connections:
         raise HTTPException(status_code=400, detail="User is not connected to a Trino database.")

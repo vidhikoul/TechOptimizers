@@ -7,3 +7,4 @@ langchain-huggingface
 mysql-connector-python
 faiss-cpu
 sentence-transformers
+trino
