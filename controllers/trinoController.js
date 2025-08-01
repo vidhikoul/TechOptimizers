@@ -2,7 +2,7 @@ const axios = require("axios");
 const dotenv = require('dotenv');
 
 dotenv.config();
-
+// connecting to trino database
 async function connectToDB(req, res){
     const {uid, user, host, port} = req.body;
     if (!host || !user || !uid || !port) {
@@ -21,7 +21,7 @@ async function connectToDB(req, res){
         return res.status(500).json({success : false , message: error.message });
     }
 }
-
+// executing query on trino
 async function ExecuteQuery(req, res) {
     const { uid, query } = req.body;
     

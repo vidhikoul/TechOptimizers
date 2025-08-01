@@ -36,6 +36,7 @@ function login(req, res){
     }
 }
 
+// creating new account
 function register(req, res){
     const {uid, password} = req.body;
     const QUERY = "INSERT INTO users(uid, password) VALUES(?, ?)";
