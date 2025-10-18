@@ -6,6 +6,6 @@ langchain-community
 langchain-huggingface
 mysql-connector-python
 faiss-cpu
-langchain
+langchain-text-splitters
 sentence-transformers
 trino

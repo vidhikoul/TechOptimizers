@@ -3,7 +3,7 @@ from groq import Groq
 from pydantic import BaseModel
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 import mysql.connector
 import trino
 from fastapi.middleware.cors import CORSMiddleware
