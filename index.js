@@ -51,7 +51,7 @@ app.post("/api/convert-to-prisma", async (req, res) => {
         role: "user",
         content: `Convert this SQL schema to Prisma schema format:\n\n${sqlSchema}\n\nOnly provide the Prisma schema code, no explanations.`
       }],
-      model: "llama3-70b-8192",
+      model: "llama-3.1-8b-instant",
       temperature: 0.7,
       max_tokens: 1024
     });
