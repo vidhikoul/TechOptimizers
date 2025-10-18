@@ -7,6 +7,10 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import mysql.connector
 import trino
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = FastAPI()
 
@@ -109,7 +113,7 @@ def create_vector_db(txt_text, dbname):
     vector_db.save_local(dbname)
 
 def send_to_groq(query):
-    client = Groq(api_key="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")
+    client = Groq(api_key=os.getenv("GROQ_KEY"))
     completion = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content" : query}],
