@@ -170,10 +170,10 @@ const SchemaGenerator = () => {
       </Navbar>
       <br />
 
-      <Row className="g-4">
+      <Row className=" g-4">
         {/* Left Column - Chat Interface */}
         <Col md={6}>
-          <Card className="h-100 shadow-sm">
+          <Card className=" shadow-sm">
             <Card.Body>
               <Card.Title>Schema Recommendation</Card.Title>
               

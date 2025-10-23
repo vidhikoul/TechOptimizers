@@ -556,7 +556,7 @@ const SQLAssistant = () => {
         <div className="chat-container" ref={containerRef}>
           <div className="left-panel">
             <Card className="h-100 d-flex flex-column">
-              <Card.Header className="bg-white p-2">
+              <Card.Header className="bg-primary bg-opacity-10  rounded-3 shadow-sm border border-primary border-opacity-45 p-2">
                 <h5 className="m-0 fs-5">SQL Chat Assistant</h5>
               </Card.Header>
               <Card.Body className="d-flex flex-column p-0 overflow-hidden">
@@ -681,7 +681,7 @@ const SQLAssistant = () => {
               )}
               
               <Card className="flex-grow-1 mb-2 shadow-sm">
-                <Card.Header className="bg-white p-2 d-flex justify-content-between align-items-center">
+                <Card.Header className="bg-primary bg-opacity-10  rounded-3 shadow-sm border border-primary border-opacity-45  p-2 d-flex justify-content-between align-items-center">
                   <h5 className="m-0 fs-5">SQL Editor</h5>
                   {ghostMode && (
                     <span className="text-success" style={{ fontSize: '0.8rem' }}>
@@ -726,7 +726,7 @@ const SQLAssistant = () => {
               </Card>
 
               <Card className="shadow-sm flex-grow-1">
-                <Card.Header className="bg-white p-2">
+                <Card.Header className="bg-primary bg-opacity-10  rounded-3 shadow-sm border border-primary border-opacity-45  p-2">
                   <h5 className="m-0 fs-5">Query Results</h5>
                 </Card.Header>
                 <Card.Body className="p-0">
