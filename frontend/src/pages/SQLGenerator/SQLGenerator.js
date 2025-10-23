@@ -125,7 +125,7 @@ const SQLAssistant = () => {
       return;
     }
     try {
-      const response = await fetch(`http://localhost:5001/api/${dbType}/connect`, {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/api/${dbType}/connect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dbType, ...currentConfig }),
@@ -174,7 +174,7 @@ const SQLAssistant = () => {
   const handleGhostSuggestion = async (comment) => {
     setIsGeneratingGhostSuggestion(true);
     try {
-      const res = await axios.post(`http://localhost:5001/api/${dbType}/generateSql`, {
+      const res = await axios.post(`${process.env.REACT_APP_SERVER_URL}/api/${dbType}/generateSql`, {
         "uid" : "tempuser", "query" : comment, "dialect" : dbType
       });
       console.log(res.data);
@@ -222,7 +222,7 @@ const SQLAssistant = () => {
     setChatHistory(prev => [...prev, { type: 'user', content: userQuery }]);
     
     try {
-      const res = await axios.post(`http://localhost:5001/api/${dbType}/generateSql`, {
+      const res = await axios.post(`${process.env.REACT_APP_SERVER_URL}/api/${dbType}/generateSql`, {
         "uid" : "tempuser", "query" : userQuery, "dialect" : dbType
       });
       
@@ -246,7 +246,7 @@ const SQLAssistant = () => {
     
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/${dbType}/execute`, {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/api/${dbType}/execute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

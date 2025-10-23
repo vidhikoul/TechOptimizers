@@ -51,7 +51,7 @@ const SchemaGenerator = () => {
     setLoading(true);
     try {
       const schemaResponse = await fetch(
-        `http://localhost:5001/api/sql/schema?userQuery=${encodeURIComponent(schemaPrompt)}`,
+        `${process.env.REACT_APP_SERVER_URL}/api/sql/schema?userQuery=${encodeURIComponent(schemaPrompt)}`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -82,7 +82,7 @@ const SchemaGenerator = () => {
       ]);
 
       const prismaResponse = await fetch(
-        "http://localhost:5001/api/convert-to-prisma",
+        `${process.env.REACT_APP_SERVER_URL}/api/convert-to-prisma`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

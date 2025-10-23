@@ -33,7 +33,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
         }
 
         try {
-            const res = await axios.post("http://localhost:5001/api/auth/login", values);
+            const res = await axios.post(`${process.env.REACT_APP_SERVER_URL}/api/auth/login`, values);
             console.log("Login successful:", res.data);
 
             if (setIsLoggedIn) {

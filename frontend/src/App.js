@@ -15,8 +15,11 @@ import HomePage from "./pages/HomePage"; // HomePage with a SignIn link
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("isLoggedIn") === "true"
+    true
   );
+  // const [isLoggedIn, setIsLoggedIn] = useState(
+  //   localStorage.getItem("isLoggedIn") === "true"
+  // );
   // const [isDarkMode, setIsDarkMode] = useState(
   //   localStorage.getItem("darkMode") === "true" // Check if dark mode is set in localStorage
   // );
@@ -34,9 +37,9 @@ function App() {
   // }, [isDarkMode]);
 
 
-  useEffect(() => {
-    localStorage.setItem("isLoggedIn", isLoggedIn);
-  }, [isLoggedIn]);
+  // useEffect(() => {
+  //   localStorage.setItem("isLoggedIn", isLoggedIn);
+  // }, [isLoggedIn]);
 
   return (
     <Router>
